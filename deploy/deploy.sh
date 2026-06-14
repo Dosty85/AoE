@@ -28,7 +28,8 @@ if ! command -v node >/dev/null; then
 fi
 echo "Node: $(node -v)"
 systemctl daemon-reload
-systemctl enable --now aoe
+systemctl enable aoe
+systemctl restart aoe   # restart načte nový server.cjs (důležité pro redeploy)
 sleep 1
 systemctl --no-pager --full status aoe | head -n 14
 REMOTE

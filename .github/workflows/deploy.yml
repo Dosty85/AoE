@@ -1,0 +1,38 @@
+name: Deploy
+
+# Při push do main (a ručně) se hra zbuilduje a nasadí na VPS přes SSH.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Nikdy nepouštět dvě nasazení současně
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build (klient + server bundle)
+        run: npm run build:all
+
+      - name: Setup SSH klíč
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/aoe_deploy
+          chmod 600 ~/.ssh/aoe_deploy
+
+      - name: Deploy na server
+        run: bash deploy/deploy.sh "root@${{ secrets.DEPLOY_HOST }}"

@@ -1,3 +1,6 @@
+# přebíjí globální ~/.gitignore_global, který .github/ ignoruje (chceme CI workflow ve verzi)
+!.github/
+
 node_modules/
 dist/
 dist-server/

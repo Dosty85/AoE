@@ -30,6 +30,22 @@ bash deploy/deploy.sh root@37.235.109.6
 
 Klíč/host lze přepsat: `SSH_KEY=~/.ssh/jiny bash deploy/deploy.sh root@jiny-host`.
 
+## Automatický deploy (GitHub Actions)
+Workflow **`.github/workflows/deploy.yml`** při každém **push do `main`** (a ručně přes
+*Actions → Deploy → Run workflow*) zbuilduje hru a nasadí ji na server stejným `deploy/deploy.sh`.
+
+Potřebuje dva **repo secrets** (Settings → Secrets and variables → Actions):
+| Secret | Hodnota |
+|--------|---------|
+| `SSH_PRIVATE_KEY` | privátní část deploy klíče (`~/.ssh/aoe_deploy`) — odpovídá veřejnému klíči v `authorized_keys` na serveru |
+| `DEPLOY_HOST` | adresa serveru, např. `37.235.109.6` |
+
+Workflow zapíše klíč na runner, spustí `deploy/deploy.sh root@$DEPLOY_HOST` (build už proběhl v CI).
+Běh: `npm ci` → `npm run build:all` → SSH klíč → deploy. Souběžné deploye jsou serializované (`concurrency`).
+
+> Tip: stejný klíč jde používat lokálně i v CI. Pro vyšší bezpečnost lze vygenerovat oddělený CI klíč
+> a přidat jeho veřejnou část do `authorized_keys` na serveru.
+
 ## Provoz (ops)
 ```bash
 # stav + logy
