@@ -1,0 +1,76 @@
+{
+  "townCenter": {
+    "file": "townCenter.png",
+    "anchorX": 0.5,
+    "anchorY": 0.65
+  },
+  "barracks": {
+    "file": "barracks.png",
+    "anchorX": 0.5,
+    "anchorY": 0.65
+  },
+  "house": {
+    "file": "house.png",
+    "anchorX": 0.5,
+    "anchorY": 0.65
+  },
+  "tree": {
+    "file": "tree.png",
+    "anchorX": 0.5,
+    "anchorY": 0.65
+  },
+  "gold": {
+    "file": "gold.png",
+    "anchorX": 0.5,
+    "anchorY": 0.65
+  },
+  "berry": {
+    "file": "berry.png",
+    "anchorX": 0.5,
+    "anchorY": 0.65
+  },
+  "villager": {
+    "file": "villager_idle_0.png",
+    "anchorX": 0.5,
+    "anchorY": 0.65,
+    "scale": 1.0,
+    "fps": 10,
+    "anims": {
+      "idle": [
+        "villager_idle_0.png"
+      ],
+      "walk": [
+        "villager_walk_0.png",
+        "villager_walk_1.png",
+        "villager_walk_2.png",
+        "villager_walk_3.png",
+        "villager_walk_4.png",
+        "villager_walk_5.png",
+        "villager_walk_6.png",
+        "villager_walk_7.png"
+      ]
+    }
+  },
+  "soldier": {
+    "file": "soldier_idle_0.png",
+    "anchorX": 0.5,
+    "anchorY": 0.65,
+    "scale": 1.0,
+    "fps": 10,
+    "anims": {
+      "idle": [
+        "soldier_idle_0.png"
+      ],
+      "walk": [
+        "soldier_walk_0.png",
+        "soldier_walk_1.png",
+        "soldier_walk_2.png",
+        "soldier_walk_3.png",
+        "soldier_walk_4.png",
+        "soldier_walk_5.png",
+        "soldier_walk_6.png",
+        "soldier_walk_7.png"
+      ]
+    }
+  }
+}

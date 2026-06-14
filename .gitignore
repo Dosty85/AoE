@@ -1,0 +1,16 @@
+node_modules/
+dist/
+dist-server/
+
+# zdrojové 3D modely pro render spritů (CC0, stahují se zvlášť; dev-only, ~desítky MB)
+art-src/
+
+# Blender dočasné
+*.blend1
+
+# build artefakty/screenshoty z testů
+shot*.png
+shot*.mjs
+tools/diag*
+
+# POZNÁMKA: client/public/sprites/ se commituje (hráč nic nerenderuje)
