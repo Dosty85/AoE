@@ -1,6 +1,9 @@
 # přebíjí globální ~/.gitignore_global, který .github/ ignoruje (chceme CI workflow ve verzi)
 !.github/
 
+# lokální nastavení nástroje (ne součást hry)
+.claude/
+
 node_modules/
 dist/
 dist-server/
