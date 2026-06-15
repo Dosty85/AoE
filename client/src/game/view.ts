@@ -15,6 +15,7 @@ export class GameView {
   private decor = new Map<number, Sprite>() // tileIndex -> dekorace zdroje
   private animState = new Map<number, { sp: AnimatedSprite; anims: Record<string, Texture[]>; current: string; moveTimer: number }>()
   private prevWorld = new Map<number, { x: number; y: number }>()
+  private time = 0 // herní čas pro procedurální animace (sekání)
   private selected = new Set<number>()
   private artByKind: Record<EntityKind, ArtPiece>
   private hud: Hud
@@ -66,6 +67,7 @@ export class GameView {
       selectedCount: () => this.selected.size,
       player: () => this.driver.state.players[this.me],
       cmd: (c: Parameters<SimDriver['command']>[0]) => this.driver.command(c),
+      centerOn: (gx: number, gy: number) => this.scene.centerOn(gx, gy),
     }
   }
 
@@ -129,6 +131,19 @@ export class GameView {
     return tileToWorld(e.x, e.y)
   }
 
+  /** Stojí jednotka u dlaždice se zdrojem? (heuristika pro animaci těžby — funguje i v MP) */
+  private nearResource(e: Entity): boolean {
+    const gx = Math.round(e.x)
+    const gy = Math.round(e.y)
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const t = tileAt(this.map, gx + dx, gy + dy)
+        if (t && t.resource && t.amount > 0) return true
+      }
+    }
+    return false
+  }
+
   private makeSprite(a: ArtPiece): Sprite {
     let s: Sprite
     if (a.anims) {
@@ -166,17 +181,27 @@ export class GameView {
     s.alpha = !isUnit(e.kind) && e.buildLeft > 0 ? 0.5 : 1
     s.tint = e.owner === this.me ? 0xffffff : 0xff8a8a
 
-    // přepínání idle/walk podle pohybu (moveTimer překlene mezery mezi snapshoty)
+    // přepínání idle/walk (moveTimer překlene mezery mezi snapshoty) + sekání u zdroje
     const st = this.animState.get(e.id)
     if (st) {
       const prev = this.prevWorld.get(e.id)
       if (prev && Math.hypot(w.x - prev.x, w.y - prev.y) > 0.5) st.moveTimer = 15
       else if (st.moveTimer > 0) st.moveTimer--
-      const want = st.moveTimer > 0 && st.anims.walk ? 'walk' : 'idle'
+      const moving = st.moveTimer > 0
+      const chopping = !moving && e.kind === 'villager' && this.nearResource(e)
+      const want = moving && st.anims.walk ? 'walk' : 'idle'
       if (want !== st.current) {
         st.current = want
         st.sp.textures = st.anims[want]
         st.sp.play()
+      }
+      // rytmické máchnutí při těžbě: rychlý náklon dopředu, pomalejší návrat; jinak svisle
+      if (chopping) {
+        const ph = (this.time * 2.4 + e.id * 0.5) % 1
+        const chop = ph < 0.32 ? ph / 0.32 : 1 - (ph - 0.32) / 0.68
+        st.sp.rotation = chop * 0.27
+      } else {
+        st.sp.rotation = 0
       }
     }
     this.prevWorld.set(e.id, { x: w.x, y: w.y })
@@ -203,6 +228,7 @@ export class GameView {
   // ---------- smyčka ----------
   private update(dt: number): void {
     dt = Math.min(dt, 0.05)
+    this.time += dt
     this.driver.tick(dt)
     this.reconcile()
     if (this.removeDepletedDecor()) this.minimap.drawTerrain(this.map)
